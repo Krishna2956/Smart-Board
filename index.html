@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Smart Notice Board — CVR College of Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05090f;--surface:#0c1320;--card:#101928;--card2:#131f2e;
+  --border:#1a2840;--border2:#22334f;
+  --accent:#2563eb;--al:#3b82f6;--cyan:#06b6d4;
+  --gold:#f59e0b;--green:#10b981;--red:#ef4444;--violet:#8b5cf6;--pink:#ec4899;
+  --tx:#f0f4ff;--tx2:#94a3b8;--tx3:#4a6080;
+  --r:12px;--tr:.2s ease;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 15% 10%,rgba(37,99,235,.07) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 85% 85%,rgba(6,182,212,.05) 0%,transparent 60%)}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.025;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:44px 44px}
+.z{position:relative;z-index:1}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(5,9,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:62px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.logo-name{font-size:1.1rem;font-weight:700;color:var(--tx);letter-spacing:-.02em}
+.logo-name span{color:var(--cyan)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.chip{font-size:.7rem;background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.22);padding:3px 10px;border-radius:100px;font-weight:600;letter-spacing:.04em}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:.875rem;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;transition:var(--tr);border:none;text-decoration:none;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.bp{background:var(--accent);color:#fff}.bp:hover:not(:disabled){background:var(--al);transform:translateY(-1px);box-shadow:0 4px 20px rgba(37,99,235,.3)}
+.bg{background:transparent;color:var(--tx2);border:1px solid var(--border2)}.bg:hover{color:var(--tx);border-color:var(--al)}
+.bc{background:rgba(6,182,212,.12);color:var(--cyan);border:1px solid rgba(6,182,212,.25)}.bc:hover{background:rgba(6,182,212,.22)}
+.bd{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)}.bd:hover{background:rgba(239,68,68,.22)}
+.sm{padding:7px 14px;font-size:.8rem}.xs{padding:5px 11px;font-size:.74rem}
+
+/* HERO */
+.hero{padding:64px 24px 44px;text-align:center;max-width:1300px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.22);color:var(--al);font-size:.76rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:20px}
+.pulse{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 0 0 rgba(16,185,129,.4);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}70%{box-shadow:0 0 0 8px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.hero h1{font-size:clamp(2rem,5.5vw,3.8rem);font-weight:800;line-height:1.08;letter-spacing:-.04em;margin-bottom:16px}
+.grad{background:linear-gradient(135deg,var(--al),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--tx2);font-size:1rem;max-width:520px;margin:0 auto 32px;line-height:1.7;font-weight:300}
+
+/* STATS */
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:44px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 24px;min-width:110px;text-align:center;transition:var(--tr)}
+.stat:hover{border-color:var(--al);transform:translateY(-2px)}
+.sn{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,var(--al),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sl{font-size:.7rem;color:var(--tx3);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+
+/* CONTROLS */
+.wrap{max-width:1300px;margin:0 auto;padding:0 24px}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.sb{flex:1;min-width:200px;position:relative}
+.sb svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none}
+input[type=text]{width:100%;padding:10px 12px 10px 38px;background:var(--card);border:1px solid var(--border2);border-radius:9px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:var(--tr)}
+input[type=text]:focus{border-color:var(--al);background:var(--card2)}
+input[type=text]::placeholder{color:var(--tx3)}
+select{padding:10px 14px;background:var(--card);border:1px solid var(--border2);border-radius:9px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.86rem;outline:none;cursor:pointer;transition:var(--tr)}
+select:focus{border-color:var(--al)}
+.tw{display:flex;align-items:center;gap:7px;font-size:.84rem;color:var(--tx2);cursor:pointer}
+.tw input{accent-color:var(--al);width:15px;height:15px}
+
+/* PILLS */
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:26px}
+.pill{padding:6px 14px;border-radius:100px;font-size:.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--tx3);transition:var(--tr)}
+.pill:hover{color:var(--tx);border-color:var(--border2)}
+.pill.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pc{font-size:.68rem;opacity:.65;margin-left:2px}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-bottom:36px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:var(--tr);display:flex;flex-direction:column;animation:fu .3s ease both;position:relative}
+.card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ca{height:3px}
+.ca-hack{background:linear-gradient(90deg,var(--gold),var(--pink))}
+.ca-intern{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.ca-work{background:linear-gradient(90deg,var(--violet),var(--pink))}
+.ca-sport{background:linear-gradient(90deg,var(--red),var(--gold))}
+.ca-acad{background:linear-gradient(90deg,var(--cyan),var(--al))}
+.ca-schol{background:linear-gradient(90deg,var(--al),var(--violet))}
+.ca-other{background:linear-gradient(90deg,var(--tx3),var(--border2))}
+.ch{padding:14px 16px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cb{padding:3px 9px;border-radius:6px;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.cb-hack{background:rgba(245,158,11,.15);color:var(--gold)}
+.cb-intern{background:rgba(16,185,129,.15);color:var(--green)}
+.cb-work{background:rgba(139,92,246,.15);color:var(--violet)}
+.cb-sport{background:rgba(239,68,68,.15);color:var(--red)}
+.cb-acad{background:rgba(6,182,212,.15);color:var(--cyan)}
+.cb-schol{background:rgba(37,99,235,.15);color:var(--al)}
+.cb-other{background:rgba(100,116,139,.15);color:var(--tx2)}
+.cbody{padding:10px 16px 0;flex:1}
+.ctitle{font-size:.98rem;font-weight:700;line-height:1.35;margin-bottom:6px;color:var(--tx)}
+.cdesc{font-size:.81rem;color:var(--tx2);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prize{display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.18);color:var(--gold);font-size:.74rem;font-weight:600;padding:3px 9px;border-radius:6px;margin-bottom:9px}
+.meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.mi{display:flex;align-items:center;gap:4px;font-size:.74rem;color:var(--tx3)}
+.cf{padding:11px 16px 13px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.dc{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:6px}
+.d-soon{background:rgba(239,68,68,.12);color:var(--red)}
+.d-ok{background:rgba(16,185,129,.12);color:var(--green)}
+.d-none{background:var(--surface);color:var(--tx3)}
+.stag{font-size:.68rem;color:var(--tx3);background:var(--surface);padding:2px 7px;border-radius:5px;font-family:'JetBrains Mono',monospace}
+.exp-ov{position:absolute;inset:0;background:rgba(5,9,15,.72);display:flex;align-items:center;justify-content:center;border-radius:16px;font-size:.88rem;font-weight:700;color:var(--red);letter-spacing:.12em;text-transform:uppercase;z-index:2}
+
+/* EMPTY / LOADER */
+.empty{text-align:center;padding:64px 0;color:var(--tx3);grid-column:1/-1}
+.loader{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--al);border-radius:50%;animation:spin .6s linear infinite;margin:64px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PAGES */
+.pages{display:flex;gap:6px;justify-content:center;margin-bottom:56px;flex-wrap:wrap}
+.pg{padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--tx2);cursor:pointer;font-size:.82rem;font-family:'Outfit',sans-serif;transition:var(--tr)}
+.pg:hover,.pg.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:28px 28px 24px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:translateY(16px);transition:transform .2s}
+.overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:1.25rem;font-weight:800;margin-bottom:20px;color:var(--tx)}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fg label{font-size:.72rem;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.fg input,.fg textarea,.fg select{padding:9px 12px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.87rem;outline:none;width:100%;transition:var(--tr)}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--al);background:var(--card2)}
+.fg input::placeholder{color:var(--tx3)}
+.fg textarea{resize:vertical;min-height:70px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.req{color:var(--red)}
+.err-msg{font-size:.76rem;color:var(--red);margin-top:3px;display:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:.85rem;color:var(--tx);box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateY(80px);opacity:0;transition:all .25s;pointer-events:none;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--green);border-left:3px solid var(--green)}
+.toast.err{border-color:var(--red);border-left:3px solid var(--red)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:22px 24px;text-align:center;color:var(--tx3);font-size:.78rem}
+footer strong{color:var(--cyan)}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .hero h1{font-size:2rem}
+  .grid{grid-template-columns:1fr}
+  .frow{grid-template-columns:1fr}
+  .controls{flex-direction:column;align-items:stretch}
+  .nav-right .chip{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-icon">📋</div>
+      <div class="logo-name">Smart<span>Board</span></div>
+    </div>
+    <div class="nav-right">
+      <span class="chip">CVR · CSE Data Science</span>
+      <button class="btn bc sm" id="btnRefresh" onclick="doScrape()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+        Refresh Data
+      </button>
+      <button class="btn bp sm" onclick="openModal()">+ Add Event</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ────────────────────────────────── -->
+<section class="z">
+  <div class="hero">
+    <div class="eyebrow"><span class="pulse"></span>Live Opportunities Feed</div>
+    <h1>Never Miss an<br/><span class="grad">Opportunity Again</span></h1>
+    <p>Hackathons, internships, workshops and campus events — all collected automatically in one place.</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sn" id="sA">—</div><div class="sl">Active</div></div>
+    <div class="stat"><div class="sn" id="sT">—</div><div class="sl">Total</div></div>
+    <div class="stat"><div class="sn" id="sE">—</div><div class="sl">Expired</div></div>
+    <div class="stat"><div class="sn" id="sS">—</div><div class="sl">Scrapes Run</div></div>
+  </div>
+</section>
+
+<!-- ── CONTROLS ─────────────────────────────── -->
+<div class="wrap z">
+  <div class="controls">
+    <div class="sb">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search events, prizes, locations…" oninput="dbn()"/>
+    </div>
+    <select id="sortSel" onchange="reload()">
+      <option value="new">Newest First</option>
+      <option value="dl">Deadline Soon</option>
+    </select>
+    <label class="tw">
+      <input type="checkbox" id="chkExp" onchange="reload()"/>
+      Show Expired
+    </label>
+  </div>
+  <div class="pills" id="pillsEl">
+    <div class="pill on" data-c="All" onclick="setCat('All')">All</div>
+  </div>
+  <div id="gridEl"><div class="loader"></div></div>
+  <div class="pages" id="pagesEl"></div>
+</div>
+
+<!-- ── ADD EVENT MODAL ───────────────────────── -->
+<div class="overlay" id="modalOverlay" onclick="clickOutside(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-title">📌 Add New Event</div>
+
+    <div class="fg">
+      <label>Title <span class="req">*</span></label>
+      <input type="text" id="mTitle" placeholder="e.g. HackIndia 2025"/>
+      <div class="err-msg" id="errTitle">Title is required.</div>
+    </div>
+
+    <div class="frow">
+      <div class="fg">
+        <label>Category</label>
+        <select id="mCat">
+          <option value="Hackathon">Hackathon</option>
+          <option value="Internship">Internship</option>
+          <option value="Workshop">Workshop</option>
+          <option value="Sports">Sports</option>
+          <option value="Academic">Academic</option>
+          <option value="Scholarship">Scholarship</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Source</label>
+        <input type="text" id="mSrc" placeholder="Devpost, CVR Dept…"/>
+      </div>
+    </div>
+
+    <div class="frow">
+      <div class="fg">
+        <label>Deadline</label>
+        <input type="date" id="mDl"/>
+      </div>
+      <div class="fg">
+        <label>Prize / Benefit</label>
+        <input type="text" id="mPrize" placeholder="₹1,00,000 / Certificate"/>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Eligibility</label>
+      <input type="text" id="mElig" placeholder="B.Tech students, 7+ CGPA"/>
+    </div>
+
+    <div class="frow">
+      <div class="fg">
+        <label>Location</label>
+        <input type="text" id="mLoc" placeholder="Online / Hyderabad"/>
+      </div>
+      <div class="fg">
+        <label>Registration Link</label>
+        <input type="text" id="mLink" placeholder="https://…"/>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Description</label>
+      <textarea id="mDesc" placeholder="Brief description of the event…"></textarea>
+    </div>
+
+    <div class="mbtns">
+      <button class="btn bg sm" onclick="closeModal()">Cancel</button>
+      <button class="btn bp sm" id="btnAdd" onclick="submitEvent()">Add Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ─────────────────────────────────── -->
+<div class="toast" id="toastEl"></div>
+
+<!-- ── FOOTER ────────────────────────────────── -->
+<footer>
+  <strong>Smart Notice Board</strong> &nbsp;·&nbsp; CVR College of Engineering &nbsp;·&nbsp;
+  Dept. of CSE (Data Science) &nbsp;·&nbsp; B.Tech II Year II Semester Real-Time Research Project
+  <br/><span style="color:var(--tx3);margin-top:4px;display:block">P. Krishna Sathvik &nbsp;|&nbsp; M. Kshitij Reddy &nbsp;|&nbsp; Y. Manideep Reddy &nbsp;|&nbsp; Guide: Mr. Ahmed Shahebaaz</span>
+</footer>
+
+<!-- ── SCRIPTS ────────────────────────────────── -->
+<script>
+"use strict";
+
+// ── CONFIG ──────────────────────────────────────────────
+const API = "http://127.0.0.1:5000/api";
+let curPage = 1;
+let curCat  = "All";
+let debTimer;
+
+// ── DEBOUNCE ─────────────────────────────────────────────
+function dbn() {
+  clearTimeout(debTimer);
+  debTimer = setTimeout(() => { curPage = 1; reload(); }, 300);
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function toast(msg, type = "ok") {
+  const el = document.getElementById("toastEl");
+  el.textContent = msg;
+  el.className = "toast show " + type;
+  setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+// ── CATEGORY HELPERS ─────────────────────────────────────
+function catBadgeClass(c) {
+  const m = { hackathon:"cb-hack", internship:"cb-intern", workshop:"cb-work",
+              sports:"cb-sport",   academic:"cb-acad",     scholarship:"cb-schol" };
+  return m[(c||"").toLowerCase()] || "cb-other";
+}
+function catAccentClass(c) {
+  const m = { hackathon:"ca-hack", internship:"ca-intern", workshop:"ca-work",
+              sports:"ca-sport",   academic:"ca-acad",     scholarship:"ca-schol" };
+  return m[(c||"").toLowerCase()] || "ca-other";
+}
+
+// ── DEADLINE CHIP ────────────────────────────────────────
+function dlChip(dl) {
+  if (!dl) return '<span class="dc d-none">No deadline</span>';
+  const days = Math.ceil((new Date(dl) - new Date()) / 86400000);
+  if (days < 0)  return '<span class="dc d-soon">Expired</span>';
+  if (days === 0) return '<span class="dc d-soon">⚡ Today!</span>';
+  if (days <= 7) return `<span class="dc d-soon">⚡ ${days}d left</span>`;
+  const d = new Date(dl);
+  return `<span class="dc d-ok">📅 ${d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</span>`;
+}
+
+// ── STATS ────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const d = await fetch(API + "/stats").then(r => r.json());
+    document.getElementById("sA").textContent = d.active  ?? "—";
+    document.getElementById("sT").textContent = d.total   ?? "—";
+    document.getElementById("sE").textContent = d.expired ?? "—";
+    document.getElementById("sS").textContent = d.scrapes ?? "—";
+  } catch(e) { /* backend might not be up yet */ }
+}
+
+// ── CATEGORIES ───────────────────────────────────────────
+async function loadCats() {
+  try {
+    const cats = await fetch(API + "/categories").then(r => r.json());
+    const el = document.getElementById("pillsEl");
+    el.innerHTML = `<div class="pill on" data-c="All" onclick="setCat('All')">All</div>`;
+    cats.forEach(c => {
+      const cls = curCat === c.name ? " on" : "";
+      el.innerHTML += `<div class="pill${cls}" data-c="${c.name}" onclick="setCat('${c.name}')">${c.name}<span class="pc">${c.count}</span></div>`;
+    });
+  } catch(e) {}
+}
+
+function setCat(c) {
+  curCat  = c;
+  curPage = 1;
+  document.querySelectorAll(".pill").forEach(p => p.classList.toggle("on", p.dataset.c === c));
+  reload();
+}
+
+// ── LOAD EVENTS ──────────────────────────────────────────
+async function reload() {
+  const q    = document.getElementById("searchInput").value.trim();
+  const exp  = document.getElementById("chkExp").checked;
+  const grid = document.getElementById("gridEl");
+  grid.innerHTML = '<div class="loader"></div>';
+
+  const params = new URLSearchParams({
+    page:  curPage,
+    limit: 12,
+    ...(curCat !== "All" && { category: curCat }),
+    ...(q && { search: q }),
+    ...(exp && { expired: "true" }),
+  });
+
+  try {
+    const data = await fetch(`${API}/events?${params}`).then(r => r.json());
+    renderCards(data.events || []);
+    renderPages(data.page, data.pages);
+  } catch(e) {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        <svg width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.25;margin-bottom:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p style="font-size:.9rem">Cannot reach backend.<br/>
+        Open terminal → <code style="background:var(--surface);padding:2px 7px;border-radius:4px;font-family:monospace">cd backend</code> →
+        <code style="background:var(--surface);padding:2px 7px;border-radius:4px;font-family:monospace">python app.py</code></p>
+      </div>`;
+  }
+}
+
+function renderCards(evs) {
+  const el = document.getElementById("gridEl");
+  if (!evs.length) {
+    el.innerHTML = `<div class="empty"><svg width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.25;margin-bottom:10px"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p>No events found. Try a different search or category.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="grid">${evs.map((e, i) => makeCard(e, i)).join("")}</div>`;
+}
+
+function makeCard(e, i) {
+  const exp  = e.is_expired ? '<div class="exp-ov">Expired</div>' : "";
+  const lnk  = (e.link && e.link !== "#")
+    ? `<a href="${e.link}" target="_blank" rel="noopener" class="btn bp xs">Register →</a>`
+    : `<span style="font-size:.72rem;color:var(--tx3)">No link</span>`;
+  const prize = e.prize
+    ? `<div class="prize">🏆 ${e.prize}</div>`
+    : "";
+  const loc  = e.location
+    ? `<div class="mi"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${e.location}</div>`
+    : "";
+  const elig = e.eligibility
+    ? `<div class="mi"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${e.eligibility}</div>`
+    : "";
+
+  return `
+  <div class="card" style="animation-delay:${i * 0.035}s">
+    <div class="ca ${catAccentClass(e.category)}"></div>
+    ${exp}
+    <div class="ch">
+      <span class="cb ${catBadgeClass(e.category)}">${e.category || "Other"}</span>
+      <button class="btn bd xs" onclick="deleteEvent(${e.id})" title="Delete event">✕</button>
+    </div>
+    <div class="cbody">
+      <div class="ctitle">${e.title}</div>
+      ${prize}
+      <div class="cdesc">${e.description || "No description available."}</div>
+      <div class="meta">${loc}${elig}</div>
+    </div>
+    <div class="cf">
+      ${dlChip(e.deadline)}
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="stag">${e.source || "—"}</span>
+        ${lnk}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPages(p, total) {
+  const el = document.getElementById("pagesEl");
+  if (!total || total <= 1) { el.innerHTML = ""; return; }
+  let h = "";
+  if (p > 1)     h += `<button class="pg" onclick="goPage(${p-1})">← Prev</button>`;
+  for (let i = 1; i <= total; i++)
+    h += `<button class="pg${i === p ? " on" : ""}" onclick="goPage(${i})">${i}</button>`;
+  if (p < total) h += `<button class="pg" onclick="goPage(${p+1})">Next →</button>`;
+  el.innerHTML = h;
+}
+
+function goPage(p) {
+  curPage = p;
+  reload();
+  window.scrollTo({ top: 460, behavior: "smooth" });
+}
+
+// ── DELETE ───────────────────────────────────────────────
+async function deleteEvent(id) {
+  if (!confirm("Delete this event?")) return;
+  try {
+    const r = await fetch(`${API}/events/${id}`, { method: "DELETE" });
+    if (!r.ok) throw new Error();
+    toast("Event deleted.");
+    reload(); loadStats(); loadCats();
+  } catch(e) { toast("Failed to delete.", "err"); }
+}
+
+// ── MODAL ────────────────────────────────────────────────
+function openModal() {
+  // Clear all fields
+  ["mTitle","mSrc","mPrize","mElig","mLoc","mLink","mDesc"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("mDl").value = "";
+  document.getElementById("mCat").value = "Hackathon";
+  document.getElementById("errTitle").style.display = "none";
+  document.getElementById("modalOverlay").classList.add("open");
+  setTimeout(() => document.getElementById("mTitle").focus(), 200);
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+}
+
+function clickOutside(e) {
+  if (e.target.id === "modalOverlay") closeModal();
+}
+
+// ── SUBMIT EVENT (FIXED) ─────────────────────────────────
+async function submitEvent() {
+  const title = document.getElementById("mTitle").value.trim();
+
+  // Validate
+  if (!title) {
+    document.getElementById("errTitle").style.display = "block";
+    document.getElementById("mTitle").focus();
+    return;
+  }
+  document.getElementById("errTitle").style.display = "none";
+
+  const body = {
+    title:       title,
+    category:    document.getElementById("mCat").value,
+    source:      document.getElementById("mSrc").value.trim()   || "Manual",
+    deadline:    document.getElementById("mDl").value            || "",
+    prize:       document.getElementById("mPrize").value.trim()  || "",
+    eligibility: document.getElementById("mElig").value.trim()   || "",
+    location:    document.getElementById("mLoc").value.trim()    || "",
+    link:        document.getElementById("mLink").value.trim()   || "",
+    description: document.getElementById("mDesc").value.trim()   || "",
+  };
+
+  const btn = document.getElementById("btnAdd");
+  btn.disabled = true;
+  btn.textContent = "Adding…";
+
+  try {
+    const resp = await fetch(`${API}/events`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(body),
+    });
+
+    const result = await resp.json();
+
+    if (!resp.ok) {
+      toast("Error: " + (result.error || "Could not add event."), "err");
+      return;
+    }
+
+    toast("✅ Event \"" + title + "\" added successfully!");
+    closeModal();
+    curPage = 1;
+    reload();
+    loadStats();
+    loadCats();
+
+  } catch(e) {
+    toast("❌ Cannot connect to backend. Make sure python app.py is running.", "err");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Add Event";
+  }
+}
+
+// ── SCRAPE ───────────────────────────────────────────────
+async function doScrape() {
+  const btn = document.getElementById("btnRefresh");
+  btn.disabled = true;
+  btn.textContent = "Scraping…";
+  try {
+    const d = await fetch(`${API}/scrape`, { method: "POST" }).then(r => r.json());
+    toast("🔄 " + d.message);
+    reload(); loadStats(); loadCats();
+  } catch(e) {
+    toast("Scrape failed. Backend not running?", "err");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Refresh Data`;
+  }
+}
+
+// ── KEYBOARD SHORTCUT ─────────────────────────────────────
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeModal();
+  if (e.key === "Enter" && document.getElementById("modalOverlay").classList.contains("open")) {
+    submitEvent();
+  }
+});
+
+// ── INIT ─────────────────────────────────────────────────
+(async function init() {
+  await loadStats();
+  await loadCats();
+  await reload();
+})();
+</script>
+</body>
+</html>

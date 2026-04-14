@@ -1,4 +1,4 @@
-# 📋 Smart Notice Board
+#  Smart Notice Board
 > CVR College of Engineering — CSE (Data Science) | B.Tech II Year II Semester
  
 ## Run Locally
